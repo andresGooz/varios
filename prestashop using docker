@@ -1,0 +1,19 @@
+//se crea una red llamada prestashop-net sobre la que se implementarán los demás contenedores.
+docker network create prestashop-net
+
+//se crea un demonio database llamado mysql-container. se crea una password de root y una base de datos para prestashop
+docker run -ti --name mysql-container --network prestashop-net -e MYSQL_ROOT_PASSWORD=admin MYSQL_DATABASE=prestashop -p 3307:3306 -d mysql:5.7
+
+//se crea un container con la imágene de prestashop en la red prestashop y con DB_Server= el container de mysql anterior.
+docker run -ti --name prestashop-container --network prestashop-net -e DB_SERVER=mysql-container -p 8080:80 -d prestashop/prestashop
+
+
+
+//prestashop pedirá que se elimine la carpeta install/ y que se renombre la carpeta admin/
+//entonces con el siguiente comando ingresamos a la data del container de prestashop
+docker exec -it prestashop-container /bin/bash
+ls //listamos los elementos de /bin/bash
+rm -rf install/   //eliminamos la carpeta install/
+mv admin/ admincachi/    //renombramos la carpeta admin
+
+al ingresar a localhost:8080 ya es posible visitar y gestionar el cms
